@@ -18,6 +18,21 @@ sub cmn{
 	
 #print cmn(3,2),' ',cmn(4,2);
 #exit;
+
+sub checkTrap{
+	my $a = $_[0];
+	my $x = $_[1];
+	my $y = $_[2];
+
+	if ($y>$x){
+		my $tmp = $x;
+		$x = $y;
+		$y = $x;
+	}
+	
+	my $z = 
+}
+
 my $questCnt = <>;
 my $line;
 for (my $i = 1; $i <= $questCnt; $i ++){
