@@ -4,6 +4,9 @@ use warnings;
 use 5.014;
 
 my $debug = 0;
+sub d{
+	say $_[0] if (($debug) or (defined $_[1]));
+}
 
 sub fact{
 	return 24 if ($_[0] == 4);
@@ -15,7 +18,9 @@ sub cmn{
 	my $n = $_[1];
 	#fact($n_)/(fact($n_-$m_)*fact($m_));
 	my $up = 1;
-	$up*=$_	foreach ($n-$m+1..$n);
+	return 1 if ($m==$n);
+	$up*=$_ foreach ($n-$m+1..$n);
+		
 	$up/fact($m);
 }
 	
@@ -79,38 +84,60 @@ sub checkFullTrap{
 	} else { return 0; }
 }
 
-sub hard{
+sub fast{
 	my $questCnt = <>;
 	my $line;
 	for (my $i = 1; $i <= $questCnt; $i ++){
-		say "-------------";
+		d("-------------");
 		my $sideCnt = <>;
 		my @sides = split (' ',<>);
 		my %g;
+		my $sum = 0;
 		map {$g{$_}++;} @sides;
-		#map {say "key <$_><$g{$_}>"} keys %g;
-
+		map {d("key [$_] = [$g{$_}]")} @sides ;
+		d("-------------");
 		map {
-			my $tmpk = $_;
-			say "key [$tmpk][$g{$tmpk}]";
-			if ($g{$tmpk}>=4){
-				say "[$tmpk] >= 4";
-				say "\t",cmn(4,$g{$tmpk}); 
+
+			my $ind = $_;
+			d("key [$ind] = [$g{$ind}]");
+			if ($g{$ind}>=4){
+				$sum += cmn(4,$g{$ind});
+				d("!4! sum = $sum");
 			}	
-			say "[$tmpk] >= 2";
+
+			if ($g{$ind}>=3){
+				map {$sum += cmn(3,$g{$ind}) if (checkTrap($ind,$ind,$_))} grep ($g{$_}==1,keys %g);
+				d("!3! sum = $sum");
+			}
+
 			map {
-				say "[$tmpk] x $_";
-				say "\t",cmn(2,$g{$tmpk})*cmn(2,$g{$_}); 
-			} grep (($g{$_}>=2)&&($_!=$tmpk), keys %g);
+				$sum += cmn(2,$g{$ind})*cmn(2,$g{$_}); 
+				d("!2! sum = $sum");
+			} grep (($g{$_}>=2)&&($_!=$ind), keys %g);
+			
+			my @sides = grep ($g{$_}, keys %g);
+			for (my $i = 0; $i<@sides; $i++){
+				for (my $j = $i; $j<@sides; $j++){
+					next if ($j <= $i);
+					$sum += cmn(2,$g{$ind}) if (checkTrap($ind,$sides[$i],$sides[$j]));
+					d("!1! sum = $sum");
+				}
+			}
+				
+			delete $g{$ind};
+
 		} grep ($g{$_}>=2, keys %g);
 
 		#map {print "$_ $g{$_}\n"} keys %g;
-		#say "------";
+		d("result = $sum");
+		say $sum if (not $debug);
+
 		%g=();	
+		d("-------------");
 	}
 }
 
-sub soft{
+sub brute{
 	my $questCnt = <>;
 	my $line;
 	for (my $i = 1; $i <= $questCnt; $i ++){
@@ -148,5 +175,5 @@ sub soft{
 #print checkFullTrap(10,10,10,10)."\n";#1
 #print checkFullTrap(1,2,1,150)."\n";	# 0
 #print checkFullTrap(11,1,12,10)."\n";# 1
-say cmn(4,5000); exit;
-#soft;
+#my $m = 4; my $n = 6; say "C($m,$n) = ".cmn($m,$n); exit;
+fast;
