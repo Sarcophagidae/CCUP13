@@ -6,14 +6,17 @@ use 5.014;
 my $debug = 0;
 
 sub fact{
-	#return undef if ($_[0] == undef);
+	return 24 if ($_[0] == 4);
 	return (($_[0] == 1) || ($_[0] == 0)) ? 1 : $_[0] * fact( $_[0] - 1);
 }
 
 sub cmn{
-	my $m_ = $_[0]; 
-	my $n_ = $_[1];
-	fact($n_)/(fact($n_-$m_)*fact($m_));
+	my $m = $_[0]; 
+	my $n = $_[1];
+	#fact($n_)/(fact($n_-$m_)*fact($m_));
+	my $up = 1;
+	$up*=$_	foreach ($n-$m+1..$n);
+	$up/fact($m);
 }
 	
 sub checkTrap{
@@ -25,7 +28,7 @@ sub checkTrap{
 	if ($y<$x){
 		my $tmp = $x;
 		$x = $y;
-		$y = $x;
+		$y = $tmp;
 	}
 	
 	my $z = ($y - $x) / 2;
@@ -48,9 +51,10 @@ sub checkFullTrap{
 	my %g;
 	#say @_;
 	map {$g{$_}++;} @_;
-	my @tmp = grep ($g{$_}>1, keys %g);
-	return 1 if (@tmp == 2);
+	my @pareInd = grep ($g{$_}>1, keys %g);
+	return 1 if (@pareInd == 2);
 	my ($i, $j);
+
 	for ($i=0; $i<4; $i++){
 		my $sum = 0;
 		for ($j = 0; $j<4; $j++){
@@ -61,18 +65,17 @@ sub checkFullTrap{
 			return 0;
 		}
 	}
-
-	if (@tmp == 1){
+	if (@pareInd == 1){
 		if (isFourEqual(@_)){
 			return 1;
 		} else {
-			my @ar = grep ($_!=$tmp[0], keys %g);
+			my @ar = grep ($_!=$pareInd[0], keys %g);
 			if (@ar == 1){
-				return checkTrap($tmp[0], $tmp[0], @ar);
-			} else {	
-				return checkTrap($tmp[0], @ar);
+				return checkTrap($pareInd[0], $pareInd[0], @ar);
+			} else {
+				return checkTrap($pareInd[0], @ar);
 			}
-		}	
+		} 
 	} else { return 0; }
 }
 
@@ -144,6 +147,6 @@ sub soft{
 #print checkFullTrap(1,2,2,10)."\n"; 	# 0
 #print checkFullTrap(10,10,10,10)."\n";#1
 #print checkFullTrap(1,2,1,150)."\n";	# 0
-#print checkFullTrap(10,2,10,10)."\n";# 1
-#say cmn(4,7); exit;
-soft;
+#print checkFullTrap(11,1,12,10)."\n";# 1
+say cmn(4,5000); exit;
+#soft;
